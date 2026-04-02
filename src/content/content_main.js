@@ -113,6 +113,22 @@
 
     // HUD (Heads-Up Display) Logic
     let hudTimer = null;
+
+    function updateMainSpeed(speed) {
+        const val = Math.max(0.1, Math.min(16, speed));
+        desiredSpeed = parseFloat(val.toFixed(2));
+        
+        const valEl = document.getElementById('vprime-hud-val');
+        if (valEl) valEl.innerText = desiredSpeed.toFixed(desiredSpeed % 1 === 0 ? 1 : 2);
+        
+        window.postMessage({
+            type: 'VELOCITY_PRIME_MAIN_UPDATE',
+            speed: desiredSpeed
+        }, '*');
+
+        trackedVideos.forEach(enforceOnVideo);
+    }
+
     function showHUD(speed) {
         let hud = document.getElementById('velocity-prime-hud');
         if (!hud) {
@@ -132,14 +148,81 @@
                 zIndex: '2147483647',
                 border: '1px solid rgba(129, 140, 248, 0.3)',
                 boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
-                transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                pointerEvents: 'none',
+                transition: 'opacity 0.3s ease, border-color 0.2s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                pointerEvents: 'auto',
                 opacity: '0',
                 transform: 'scale(0.8)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+                cursor: 'ew-resize',
+                userSelect: 'none'
             });
+
+            let isDragging = false;
+            let startX = 0;
+            let startSpeed = 1.0;
+
+            const handleStart = (clientX) => {
+                isDragging = true;
+                startX = clientX;
+                startSpeed = desiredSpeed;
+                hud.style.borderColor = '#818cf8';
+                hud.style.boxShadow = '0 0 20px rgba(129, 140, 248, 0.4)';
+                document.body.style.cursor = 'ew-resize';
+                // Stop the auto-fade timer
+                clearTimeout(hudTimer);
+            };
+
+            const handleMove = (clientX) => {
+                if (!isDragging) return;
+                const deltaX = clientX - startX;
+                // Sensitivity: 1px = 0.05 speed increment for faster scrubbing
+                const newSpeed = startSpeed + (deltaX * 0.05);
+                updateMainSpeed(newSpeed);
+            };
+
+            const handleEnd = () => {
+                if (isDragging) {
+                    isDragging = false;
+                    hud.style.borderColor = 'rgba(129, 140, 248, 0.3)';
+                    hud.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.5)';
+                    document.body.style.cursor = '';
+                    // Restart auto-fade
+                    hudTimer = setTimeout(() => {
+                        hud.style.opacity = '0';
+                        hud.style.transform = 'scale(0.8)';
+                    }, 1500);
+                }
+            };
+
+            hud.addEventListener('mousedown', (e) => handleStart(e.clientX));
+            window.addEventListener('mousemove', (e) => handleMove(e.clientX));
+            window.addEventListener('mouseup', handleEnd);
+
+            // Touch support
+            hud.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX));
+            window.addEventListener('touchmove', (e) => handleMove(e.touches[0].clientX));
+            window.addEventListener('touchend', handleEnd);
+
+            // Keep HUD visible on hover
+            hud.addEventListener('mouseenter', () => {
+                if (!isDragging) {
+                    clearTimeout(hudTimer);
+                    hud.style.opacity = '1';
+                    hud.style.transform = 'scale(1)';
+                }
+            });
+
+            hud.addEventListener('mouseleave', () => {
+                if (!isDragging) {
+                    hudTimer = setTimeout(() => {
+                        hud.style.opacity = '0';
+                        hud.style.transform = 'scale(0.8)';
+                    }, 1000);
+                }
+            });
+
             const label = document.createElement('span');
             label.textContent = 'Speed';
             Object.assign(label.style, {

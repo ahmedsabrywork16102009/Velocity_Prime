@@ -66,6 +66,49 @@ function initPopup() {
   };
 
   slider.oninput = () => applySpeed(slider.value);
+
+  // Speed Scrubbing (Hover & Move Logic)
+  const speedInputWrapper = document.querySelector('.speed-input-wrapper');
+  if (speedInputWrapper) {
+    let isDragging = false;
+    let startX = 0;
+    let startSpeed = 1.0;
+
+    speedInputWrapper.style.cursor = 'ew-resize';
+
+    speedInputWrapper.addEventListener('mousedown', (e) => {
+      // If clicking exactly on the input, we might want to focus it instead
+      // but usually scrubbing starts on the wrapper/padding
+      isDragging = true;
+      startX = e.clientX;
+      startSpeed = currentSpeed;
+      document.body.style.cursor = 'ew-resize';
+      speedInputWrapper.classList.add('scrubbing');
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - startX;
+      // Sensitivity: 1px = 0.02 speed increment for precise control in popup
+      applySpeed(startSpeed + (deltaX * 0.02));
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        document.body.style.cursor = '';
+        speedInputWrapper.classList.remove('scrubbing');
+      }
+    });
+
+    // Support for scroll wheel on the number itself
+    speedInputWrapper.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const WHEEL_STEP = 0.05;
+      applySpeed(currentSpeed + (e.deltaY > 0 ? -WHEEL_STEP : WHEEL_STEP));
+    }, { passive: false });
+  }
+
   slider.onwheel = (e) => {
     e.preventDefault();
     const WHEEL_STEP = 0.01; // Ultra-micro adjustments

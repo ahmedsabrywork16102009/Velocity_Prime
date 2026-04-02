@@ -34,6 +34,16 @@ function applyGlobalSpeed(speed) {
     broadcastSpeedToMainWorld();
 }
 
+// Receive speed updates from the Main World (HUD interaction)
+window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'VELOCITY_PRIME_MAIN_UPDATE') {
+        const newSpeed = parseFloat(event.data.speed);
+        if (!isNaN(newSpeed)) {
+            applyGlobalSpeed(newSpeed);
+        }
+    }
+});
+
 // Global Keyboard Shortcuts
 document.addEventListener('keydown', (e) => {
     // Ignore when typing in inputs/textareas
