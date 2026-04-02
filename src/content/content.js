@@ -6,17 +6,31 @@
 
 let currentSpeed = 1.0;
 
+function isContextValid() {
+    return !!(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id);
+}
+
 function broadcastSpeedToMainWorld() {
-    window.postMessage({ 
-        type: 'VELOCITY_PRIME_SYNC', 
-        speed: currentSpeed 
+    // This uses window.postMessage which is generic DOM, safe from extension context invalidation
+    window.postMessage({
+        type: 'VELOCITY_PRIME_SYNC',
+        speed: currentSpeed
     }, '*');
 }
 
 function applyGlobalSpeed(speed) {
-    const newSpeed = Math.max(0.1, Math.min(16.0, parseFloat(speed)));
+    const rawSpeed = parseFloat(speed);
+    const newSpeed = Math.max(0.1, Math.min(16.0, isNaN(rawSpeed) ? 1.0 : rawSpeed));
     currentSpeed = parseFloat(newSpeed.toFixed(2));
-    chrome.storage.local.set({ globalVideoSpeed: String(currentSpeed) });
+
+    if (isContextValid()) {
+        try {
+            chrome.storage.local.set({ globalVideoSpeed: String(currentSpeed) });
+        } catch (err) {
+            console.debug('Velocity Prime: Extension context invalidated. Actions disabled.');
+        }
+    }
+
     broadcastSpeedToMainWorld();
 }
 
@@ -64,18 +78,41 @@ document.addEventListener('wheel', (e) => {
     }
 }, { passive: false });
 
-chrome.storage.local.get(['globalVideoSpeed'], (res) => {
-    if (res.globalVideoSpeed) {
-        currentSpeed = parseFloat(res.globalVideoSpeed) || 1.0;
-        broadcastSpeedToMainWorld();
-    }
-});
+if (isContextValid()) {
+    try {
+        chrome.storage.local.get(['globalVideoSpeed'], (res) => {
+            // Guard: Callback might run after context is invalidated
+            if (!isContextValid()) return;
 
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes.globalVideoSpeed) {
-        currentSpeed = parseFloat(changes.globalVideoSpeed.newValue) || 1.0;
-        broadcastSpeedToMainWorld();
+            if (chrome.runtime.lastError) return;
+            if (res && res.globalVideoSpeed) {
+                currentSpeed = parseFloat(res.globalVideoSpeed) || 1.0;
+                broadcastSpeedToMainWorld();
+            }
+        });
+    } catch (err) {
+        console.debug('Velocity Prime: Failed to initiate storage read.');
     }
-});
 
-setInterval(broadcastSpeedToMainWorld, 500);
+    try {
+        chrome.storage.onChanged.addListener((changes, area) => {
+            if (!isContextValid()) return;
+            if (area === 'local' && changes.globalVideoSpeed) {
+                currentSpeed = parseFloat(changes.globalVideoSpeed.newValue) || 1.0;
+                broadcastSpeedToMainWorld();
+            }
+        });
+    } catch (err) {
+        console.debug('Velocity Prime: Failed to add storage listener.');
+    }
+}
+
+const syncInterval = setInterval(() => {
+    if (!isContextValid()) {
+        clearInterval(syncInterval);
+        return;
+    }
+    broadcastSpeedToMainWorld();
+}, 500);
+
+
