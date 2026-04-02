@@ -111,10 +111,83 @@
         requestAnimationFrame(quantumLoop);
     }
 
+    // HUD (Heads-Up Display) Logic
+    let hudTimer = null;
+    function showHUD(speed) {
+        let hud = document.getElementById('velocity-prime-hud');
+        if (!hud) {
+            hud = document.createElement('div');
+            hud.id = 'velocity-prime-hud';
+            Object.assign(hud.style, {
+                position: 'fixed',
+                top: '20px',
+                left: '20px',
+                backgroundColor: 'rgba(15, 23, 42, 0.9)', // Slate-900
+                color: '#818cf8', // Indigo-400
+                padding: '10px 20px',
+                borderRadius: '12px',
+                fontFamily: '"Outfit", sans-serif',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                zIndex: '2147483647',
+                border: '1px solid rgba(129, 140, 248, 0.3)',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
+                transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                pointerEvents: 'none',
+                opacity: '0',
+                transform: 'scale(0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+            });
+            const label = document.createElement('span');
+            label.textContent = 'Speed';
+            Object.assign(label.style, {
+                fontSize: '14px',
+                opacity: '0.7',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+            });
+
+            const val = document.createElement('span');
+            val.id = 'vprime-hud-val';
+            val.textContent = '1.0';
+
+            const unit = document.createElement('span');
+            unit.textContent = 'x';
+            unit.style.color = '#6366f1';
+
+            hud.appendChild(label);
+            hud.appendChild(val);
+            hud.appendChild(unit);
+            document.body.appendChild(hud);
+        }
+
+        const valEl = document.getElementById('vprime-hud-val');
+        if (valEl) valEl.innerText = speed.toFixed(speed % 1 === 0 ? 1 : 2);
+
+        // Reset timer and show
+        clearTimeout(hudTimer);
+        hud.style.opacity = '1';
+        hud.style.transform = 'scale(1)';
+
+        hudTimer = setTimeout(() => {
+            hud.style.opacity = '0';
+            hud.style.transform = 'scale(0.8)';
+        }, 1500);
+    }
+
     // Listen for speed updates from the popup (via isolated world bridge)
     window.addEventListener('message', (event) => {
         if (!event.data || event.data.type !== 'VELOCITY_PRIME_SYNC') return;
-        desiredSpeed = parseFloat(event.data.speed) || 1.0;
+        const newSpeed = parseFloat(event.data.speed) || 1.0;
+        
+        // Only show HUD if speed actually changed (avoids spam from the 500ms interval)
+        if (Math.abs(newSpeed - desiredSpeed) > 0.001) {
+            showHUD(newSpeed);
+        }
+        
+        desiredSpeed = newSpeed;
         trackedVideos.forEach(enforceOnVideo); // Instant apply
     });
 

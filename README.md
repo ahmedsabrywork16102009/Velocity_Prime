@@ -10,12 +10,13 @@ Velocity Prime is a highly advanced, ultra-performant browser extension designed
 - **🛡️ The Illusion Trap**: Hooks the native `HTMLMediaElement.prototype.playbackRate` directly. If the site's anti-cheat scripts check the speed, Velocity Prime lies to them and reports exactly `1.0`, keeping you completely undetected.
 - **🔓 Native Main-World Injection (CSP Bypass)**: Uses the cutting-edge Manifest V3 `world: "MAIN"` feature to execute code synchronously inside the webpage's environment, effortlessly bypassing the strictest Content Security Policy (CSP) walls.
 - **🎨 Refined UI Design**: A stunning, custom-built interface featuring an animated speedometer gauge, a log-scale needle, hover-glow presets, and an eye-friendly "Slate/Indigo" dark theme.
-- **⌨️ Deep Keyboard Integration**: 
-  - `1` through `9` for instant speed presets (including 🔥 16x).
-  - `R` to instantly reset speed to normal (1x).
-  - `↑` / `↓` for fine-tuning by `±0.1`.
-  - `←` / `→` for larger skips of `±0.25`.
-  - `Scroll Wheel` over the slider for ultra-micro adjustments.
+- **✨ HUD Speed Indicator**: A sleek, animated overlay (Heads-Up Display) appears in the top-left corner whenever you change the speed, even with the popup closed!
+- **⌨️ Keyboard Integration**: 
+  - **🌍 Global Shortcuts** (Everywhere on page): `Ctrl + Shift + Alt` + (`R`, `Arrows`, or `Scroll Wheel`).
+  - **🎨 Popup-Only** (When open): Just the key (`R`, `Arrows`, or `Scroll Wheel`) — no modifiers needed!
+  - `Reset`: `R` to instantly return to 1x.
+  - `Fine-tuning`: `↑` / `↓` and `←` / `→` for `±0.01`.
+  - `Ultra-micro`: `Scroll Wheel` for `±0.01`.
 
 ## 🛠️ Architecture
 

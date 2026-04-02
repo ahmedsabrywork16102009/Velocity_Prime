@@ -1,15 +1,8 @@
 // Velocity Prime v2.0 — Popup Controller
 
-const STEP      = 0.1;
+const STEP      = 0.01;
 const MIN_SPEED = 0.1;
 const MAX_SPEED = 16.0;
-
-// Keyboard preset map: key -> speed
-const KEY_PRESETS = {
-  '1': 0.5, '2': 0.75, '3': 1.0,
-  '4': 1.25, '5': 1.5, '6': 1.75,
-  '7': 2.0, '8': 3.0, '9': 10.0 // Added 10 as per user request
-};
 
 let currentSpeed = 1.0;
 
@@ -75,7 +68,8 @@ function initPopup() {
   slider.oninput = () => applySpeed(slider.value);
   slider.onwheel = (e) => {
     e.preventDefault();
-    applySpeed((currentSpeed + (e.deltaY > 0 ? -STEP : STEP)).toFixed(2));
+    const WHEEL_STEP = 0.01; // Ultra-micro adjustments
+    applySpeed((currentSpeed + (e.deltaY > 0 ? -WHEEL_STEP : WHEEL_STEP)).round(2));
   };
 
   // Preset Buttons (Was broken/missing logic)
@@ -83,14 +77,24 @@ function initPopup() {
     btn.onclick = () => applySpeed(btn.dataset.speed);
   });
 
-  // Keyboard Shortcuts
+  // Popup-Only Keyboard Shortcuts (Simple keys, no modifiers needed)
   document.addEventListener('keydown', (e) => {
-    if (KEY_PRESETS[e.key] !== undefined) { applySpeed(KEY_PRESETS[e.key]); return; }
-    if (e.key === 'r' || e.key === 'R')   { applySpeed(1.0); return; }
-    if (e.key === 'ArrowUp')    { e.preventDefault(); applySpeed((currentSpeed + STEP).round(2)); return; }
-    if (e.key === 'ArrowDown')  { e.preventDefault(); applySpeed((currentSpeed - STEP).round(2)); return; }
-    if (e.key === 'ArrowRight') { e.preventDefault(); applySpeed((currentSpeed + 0.25).round(2)); return; }
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); applySpeed((currentSpeed - 0.25).round(2)); }
+    if (document.activeElement === speedInput) return;
+
+    const key = e.key.toLowerCase();
+    
+    // R to Reset
+    if (key === 'r') {
+      e.preventDefault();
+      applySpeed(1.0);
+      return;
+    }
+
+    const FINE_STEP = 0.01;
+    if (key === 'arrowup')    { e.preventDefault(); applySpeed((currentSpeed + FINE_STEP).round(2)); return; }
+    if (key === 'arrowdown')  { e.preventDefault(); applySpeed((currentSpeed - FINE_STEP).round(2)); return; }
+    if (key === 'arrowright') { e.preventDefault(); applySpeed((currentSpeed + FINE_STEP).round(2)); return; }
+    if (key === 'arrowleft')  { e.preventDefault(); applySpeed((currentSpeed - FINE_STEP).round(2)); }
   });
 }
 
