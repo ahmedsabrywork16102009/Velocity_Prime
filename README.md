@@ -33,4 +33,3 @@ Instead of the usual vulnerable DOM script injection that can be blocked or mani
 5. Pin the extension for quick access, and enjoy absolute video playback control.
 
 ---
-*Built with ⚡️ by Antigravity*
