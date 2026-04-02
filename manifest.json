@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Velocity Prime",
+  "version": "2.0.0",
+  "description": "Professional 60FPS Video Speed Controller with Anti-Cheat Bypass",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/content.js"],
+      "all_frames": true,
+      "match_about_blank": true,
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/content_main.js"],
+      "all_frames": true,
+      "match_about_blank": true,
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "host_permissions": ["<all_urls>"]
+}
