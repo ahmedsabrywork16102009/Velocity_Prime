@@ -1,0 +1,25 @@
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.logo-container img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+}
+
+.logo-container h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+}

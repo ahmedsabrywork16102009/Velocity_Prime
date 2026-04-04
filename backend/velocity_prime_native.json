@@ -1,0 +1,9 @@
+{
+  "name": "com.velocityprime.bridge",
+  "description": "Velocity Prime Native Bridge",
+  "path": "c:\\Users\\Ahmed\\Desktop\\ComputerFiles\\Programming\\Extensions\\VelocityPrime\\backend\\bridge_run.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://nnlohajcdolakkpbiidclpjbgpmciaha/"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "velocity-prime",
+  "version": "2.0.0",
+  "description": "Professional 60FPS Video Speed Controller with Anti-Cheat Bypass",
+  "type": "module",
+  "scripts": {
+    "dev":   "node build.js --watch",
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
