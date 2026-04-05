@@ -20,6 +20,7 @@
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     cursor: ew-resize;
     user-select: none;
+    overflow: visible;
 }
 
 .speed-input-wrapper:hover    { border-color: var(--accent); background: rgba(0,242,254,0.05); box-shadow: 0 0 15px rgba(0,242,254,0.15); }
@@ -35,8 +36,11 @@
     background: transparent;
     border: none;
     outline: none;
-    width: 75px;
+    width: 4ch;
+    min-width: 2.5ch;
+    max-width: 5ch;
     text-shadow: 0 0 16px rgba(0, 242, 254, 0.45);
+    overflow: visible;
 }
 
 .speed-display::-webkit-inner-spin-button,

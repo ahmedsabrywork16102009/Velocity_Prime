@@ -59,18 +59,21 @@ document.addEventListener('keydown', (e) => {
 
     const key  = e.key.toLowerCase();
     const STEP = 0.05;
+    const snap = (v, step) => Math.floor(parseFloat(v.toFixed(10)) / step) * step;
 
     if (key === 'r') { e.preventDefault(); applyGlobalSpeed(1.0); return; }
 
-    if (key === 'arrowup'    || key === 'arrowright') { e.preventDefault(); applyGlobalSpeed(currentSpeed + STEP); }
-    else if (key === 'arrowdown' || key === 'arrowleft') { e.preventDefault(); applyGlobalSpeed(currentSpeed - STEP); }
+    if (key === 'arrowup'    || key === 'arrowright') { e.preventDefault(); applyGlobalSpeed(parseFloat((snap(currentSpeed, STEP) + STEP).toFixed(2))); }
+    else if (key === 'arrowdown' || key === 'arrowleft') { e.preventDefault(); applyGlobalSpeed(parseFloat((snap(currentSpeed, STEP) - STEP).toFixed(2))); }
 }, true); // Capture phase — ensures we intercept before site handlers
 
 // ── Global Scroll Wheel (Ctrl+Shift+Alt + Scroll) ────────────
 document.addEventListener('wheel', (e) => {
     if (!(e.ctrlKey && e.shiftKey && e.altKey)) return;
     e.preventDefault();
-    applyGlobalSpeed(currentSpeed + (e.deltaY > 0 ? -0.05 : 0.05));
+    const STEP = 0.05;
+    const snap = (v, step) => Math.floor(parseFloat(v.toFixed(10)) / step) * step;
+    applyGlobalSpeed(parseFloat((snap(currentSpeed, STEP) + (e.deltaY > 0 ? -STEP : STEP)).toFixed(2)));
 }, { passive: false });
 
 // ── Load initial speed from storage ──────────────────────────

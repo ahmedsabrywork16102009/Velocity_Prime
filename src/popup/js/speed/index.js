@@ -6,6 +6,9 @@ import { initSpeedKeyboard }        from './keyboard.js';
 import { round }                    from '../utils/round.js';
 import { STEP }                     from '../constants.js';
 
+// Snap value down to the nearest grid point of `step`
+const snap = (v, step) => Math.floor(round(v, 10) / step) * step;
+
 export function initSpeedController() {
     const slider       = document.getElementById('main-slider');
     const speedInput   = document.getElementById('current-speed-input');
@@ -21,8 +24,8 @@ export function initSpeedController() {
     });
 
     // +/− buttons
-    speedDownBtn?.addEventListener('click', () => applySpeed(currentSpeed - STEP));
-    speedUpBtn?.addEventListener('click',   () => applySpeed(currentSpeed + STEP));
+    speedDownBtn?.addEventListener('click', () => applySpeed(round(snap(currentSpeed, STEP) - STEP, 2)));
+    speedUpBtn?.addEventListener('click',   () => applySpeed(round(snap(currentSpeed, STEP) + STEP, 2)));
 
     // Manual text input
     speedInput.addEventListener('change',  () => applySpeed(speedInput.value));
@@ -34,7 +37,8 @@ export function initSpeedController() {
     slider.addEventListener('input',  () => applySpeed(slider.value));
     slider.addEventListener('wheel', (e) => {
         e.preventDefault();
-        applySpeed(round(currentSpeed + (e.deltaY > 0 ? -STEP : STEP), 2));
+        const snapped = snap(currentSpeed, STEP);
+        applySpeed(round(snapped + (e.deltaY > 0 ? -STEP : STEP), 2));
     }, { passive: false });
 
     // Preset buttons

@@ -23,7 +23,9 @@ export function applySpeed(rawSpeed) {
     // Sync number input (skip when user is actively typing)
     const inp = document.getElementById('current-speed-input');
     if (inp && document.activeElement !== inp) {
-        inp.value = Number.isInteger(fixed) ? fixed.toFixed(1) : fixed;
+        const display = Number.isInteger(fixed) ? fixed.toFixed(1) : String(fixed);
+        inp.value = display;
+        inp.style.width = `${display.length}ch`;
     }
 
     // Highlight matching preset
